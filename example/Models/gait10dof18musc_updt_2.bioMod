@@ -1,0 +1,1098 @@
+version 4
+
+// File extracted from Models/gait10dof18musc_updt_2_no_pinjoint.osim
+
+//Publication : Delp, S.L., Loan, J.P., Hoy, M.G., Zajac, F.E., Topp E.L., Rosen, J.M.: An interactive graphics-based model of the lower extremity to study orthopaedic surgical procedures, IEEE Transactions on Biomedical Engineering, vol. 37, pp. 757-767, 1990. Yamaguchi G.T., Zajac F.E.: A planar model of the knee joint to characterize the knee extensor mechanism." J . Biomech. vol. 22. pp. 1-10. 1989. Anderson F.C., Pandy M.G.: A dynamic optimization solution for vertical jumping in three dimensions. Computer Methods in Biomechanics and Biomedical Engineering 2:201-231, 1999. Anderson F.C., Pandy M.G.: Dynamic optimization of human walking. Journal of Biomechanical Engineering 123:381-390, 2001.
+
+//Credit : A planar reduced gait model with 10 degrees of freedom and 18 muscles by Ajay Seth. Closely based on Delp S.L., Loan J.P., Hoy M.G., Zajac F.E., Topp E.L., Rosen J.M., Thelen D.G., Anderson F.C., Seth A. Notes: 3D, 23 DOF gait model created by D.G. Thelen, Univ. of Wisconsin-Madison, and Ajay Seth, Frank C. Anderson, and Scott L. Delp, Stanford University. Lower extremity joint defintions based on Delp et al. (1990). Low back joint and anthropometry based on Anderson and Pandy (1999, 2001). Planar knee model of Yamaguchi and Zajac (1989). Seth replaced tibia translation constraints with a CustomJoint for the knee and removed the patella to eliminate all kinematic constraints; insertions of the quadrucepts are handled with moving points in the tibia frame as defined by Delp 1990. Number of muscles was reduced by Anderson to improve simulation speed for demonstrations and is not intended to be used in research. License: Creative Commons (CCBY 3.0). You are free to distribute, remix, tweak, and build upon this work, even commercially, as long as you credit us for the original creation. http://creativecommons.org/licenses/by/3.0/ More Information: http://simtk-confluence.stanford.edu:8080/display/OpenSim/Gait+2392+and+2354+Models
+
+//Force units : N
+
+//Length units : meters
+
+
+gravity	0 -9.8066499999999994 0
+
+// SEGMENT DEFINITION
+
+// Information about ground segment
+
+    //True segment where are applied inertial values.
+	// Segment
+	segment ground
+		parent base 
+		RTinMatrix	0
+		RT	0	 0	 0	xyz	0	 0	 0
+	endsegment
+
+	// Markers
+
+// Information about pelvis segment
+	// Segment
+	segment pelvis_parent_offset
+		parent ground 
+		RTinMatrix	0
+		RT	0 0 0	xyz	0 0 0
+	endsegment
+
+	// Segments to define transformation axis.
+	// Segment
+	segment pelvis_translation
+		parent pelvis_parent_offset 
+		RTinMatrix	1
+		RT
+			1.0		0.0		0.0		0
+			0.0		1.0		0.0		0
+			0.0		0.0		1.0		0
+			0		0		0		1
+		translations xy
+		// ranges
+				// -5 5
+				// -1 2
+	endsegment
+
+// Rotation transform was initially an orthogonal basis
+	// Segment
+	segment pelvis_rotation_transform
+		parent pelvis_translation 
+		RTinMatrix	1
+		RT
+			0.0		1.0		0.0		0
+			0.0		0.0		1.0		0
+			1.0		0.0		0.0		0
+			0		0		0		1
+		rotations x
+		// ranges
+				// -1.5707963300000001 1.5707963300000001
+	endsegment
+
+
+    // Segment to cancel transformation bases effect.
+	// Segment
+	segment pelvis_reset_axis
+		parent pelvis_rotation_transform 
+		RTinMatrix	1
+		RT
+			0.0		0.0		1.0		0
+			1.0		0.0		0.0		0
+			0.0		1.0		0.0		0
+			0		0		0		1
+	endsegment
+
+	// Segment
+	segment pelvis_geom_2
+		parent pelvis_reset_axis 
+		RTinMatrix	0
+		RT	-0.0	 0.0	 -0.0	xyz	-0.0	 -0.0	 -0.0
+		meshfile	Geometry/pelvis.vtp
+		meshcolor	1 1 1
+		meshscale	1 1 1
+	endsegment
+
+	// Segment
+	segment pelvis_geom_3
+		parent pelvis_geom_2 
+		RTinMatrix	0
+		RT	0	 0	 0	xyz	0	 0	 0
+		meshfile	Geometry/l_pelvis.vtp
+		meshcolor	1 1 1
+		meshscale	1 1 1
+	endsegment
+
+
+    //True segment where are applied inertial values.
+	// Segment
+	segment pelvis
+		parent pelvis_geom_3 
+		RTinMatrix	0
+		RT	0	 0	 0	xyz	0	 0	 0
+		mass	11.776999999999999
+		inertia
+			0.1028	0	0
+			0	0.087099999999999997	0
+			0	0	0.0579
+		com	-0.070699999999999999 0 0
+		meshfile	Geometry/sacrum.vtp
+		meshcolor	1 1 1
+		meshscale	1 1 1
+	endsegment
+
+	// Markers
+
+// Information about femur_r segment
+	// Segment
+	segment femur_r_parent_offset
+		parent pelvis 
+		RTinMatrix	0
+		RT	0 0 0	xyz	-0.070699999999999999 -0.066100000000000006 0.083500000000000005
+	endsegment
+
+
+    // Segment to cancel transformation bases effect.
+	// Segment
+	segment femur_r_reset_axis
+		parent femur_r_parent_offset 
+		RTinMatrix	1
+		RT
+			1.0		0.0		0.0		0
+			0.0		1.0		0.0		0
+			0.0		0.0		1.0		0
+			0		0		0		1
+	endsegment
+
+
+    //True segment where are applied inertial values.
+	// Segment
+	segment femur_r
+		parent femur_r_reset_axis 
+		RTinMatrix	0
+		RT	-0.0	 0.0	 -0.0	xyz	-0.0	 -0.0	 -0.0
+		mass	9.3013999999999992
+		inertia
+			0.13389999999999999	0	0
+			0	0.035099999999999999	0
+			0	0	0.14119999999999999
+		com	0 -0.17000000000000001 0
+		meshfile	Geometry/femur_r.vtp
+		meshcolor	1 1 1
+		meshscale	1 1 1
+	endsegment
+
+	// Markers
+
+// Information about tibia_r segment
+	// Segment
+	segment tibia_r_parent_offset
+		parent femur_r 
+		RTinMatrix	0
+		RT	0 0 0	xyz	0 0 0
+	endsegment
+
+	// Segments to define transformation axis.
+	// Segment
+	segment tibia_r_translation
+		parent tibia_r_parent_offset 
+		RTinMatrix	1
+		RT
+			1.0		0.0		0.0		0
+			0.0		1.0		0.0		0
+			0.0		0.0		1.0		0
+			0		0		0		1
+		translations xy
+		// ranges
+				// -2.0943950999999998 0.17453293
+				// -2.0943950999999998 0.17453293
+	endsegment
+
+// Rotation transform was initially an orthogonal basis
+	// Segment
+	segment tibia_r_rotation_transform
+		parent tibia_r_translation 
+		RTinMatrix	1
+		RT
+			0.0		0.0		1.0		0
+			0.0		1.0		0.0		0
+			1.0		0.0		0.0		0
+			0		0		0		1
+		rotations x
+		// ranges
+				// -2.0943950999999998 0.17453293
+	endsegment
+
+
+    // Segment to cancel transformation bases effect.
+	// Segment
+	segment tibia_r_reset_axis
+		parent tibia_r_rotation_transform 
+		RTinMatrix	1
+		RT
+			0.0		0.0		1.0		0
+			0.0		1.0		0.0		0
+			1.0		0.0		0.0		0
+			0		0		0		1
+	endsegment
+
+	// Segment
+	segment tibia_r_geom_2
+		parent tibia_r_reset_axis 
+		RTinMatrix	0
+		RT	-0.0	 0.0	 -0.0	xyz	-0.0	 -0.0	 -0.0
+		meshfile	Geometry/fibula.vtp
+		meshcolor	1 1 1
+		meshscale	1 1 1
+	endsegment
+
+
+    //True segment where are applied inertial values.
+	// Segment
+	segment tibia_r
+		parent tibia_r_geom_2 
+		RTinMatrix	0
+		RT	0	 0	 0	xyz	0	 0	 0
+		mass	3.7075
+		inertia
+			0.0504	0	0
+			0	0.0051000000000000004	0
+			0	0	0.0511
+		com	0 -0.1867 0
+		meshfile	Geometry/tibia_r.vtp
+		meshcolor	1 1 1
+		meshscale	1 1 1
+	endsegment
+
+	// Markers
+
+// Information about talus_r segment
+	// Segment
+	segment talus_r_parent_offset
+		parent tibia_r 
+		RTinMatrix	0
+		RT	0 0 0	xyz	0 -0.42999999999999999 0
+	endsegment
+
+
+    // Segment to cancel transformation bases effect.
+	// Segment
+	segment talus_r_reset_axis
+		parent talus_r_parent_offset 
+		RTinMatrix	1
+		RT
+			1.0		0.0		0.0		0
+			0.0		1.0		0.0		0
+			0.0		0.0		1.0		0
+			0		0		0		1
+	endsegment
+
+
+    //True segment where are applied inertial values.
+	// Segment
+	segment talus_r
+		parent talus_r_reset_axis 
+		RTinMatrix	0
+		RT	-0.0	 0.0	 -0.0	xyz	-0.0	 -0.0	 -0.0
+		mass	0.10000000000000001
+		inertia
+			0.001	0	0
+			0	0.001	0
+			0	0	0.001
+		com	0 0 0
+		meshfile	Geometry/talus.vtp
+		meshcolor	1 1 1
+		meshscale	1 1 1
+	endsegment
+
+	// Markers
+
+// Information about calcn_r segment
+	// Segment
+	segment calcn_r_parent_offset
+		parent talus_r 
+		RTinMatrix	0
+		RT	0 0 0	xyz	-0.048770000000000001 -0.041950000000000001 0.00792
+	endsegment
+
+
+    // Segment to cancel transformation bases effect.
+	// Segment
+	segment calcn_r_reset_axis
+		parent calcn_r_parent_offset 
+		RTinMatrix	1
+		RT
+			1.0		0.0		0.0		0
+			0.0		1.0		0.0		0
+			0.0		0.0		1.0		0
+			0		0		0		1
+	endsegment
+
+
+    //True segment where are applied inertial values.
+	// Segment
+	segment calcn_r
+		parent calcn_r_reset_axis 
+		RTinMatrix	0
+		RT	-0.0	 0.0	 -0.0	xyz	-0.0	 -0.0	 -0.0
+		mass	1.25
+		inertia
+			0.0014	0	0
+			0	0.0038999999999999998	0
+			0	0	0.0041000000000000003
+		com	0.10000000000000001 0.029999999999999999 0
+		meshfile	Geometry/foot.vtp
+		meshcolor	1 1 1
+		meshscale	1 1 1
+	endsegment
+
+	// Markers
+
+// Information about toes_r segment
+	// Segment
+	segment toes_r_parent_offset
+		parent calcn_r 
+		RTinMatrix	0
+		RT	0 0 0	xyz	0.17879999999999999 -0.002 0.00108
+	endsegment
+
+
+    // Segment to cancel transformation bases effect.
+	// Segment
+	segment toes_r_reset_axis
+		parent toes_r_parent_offset 
+		RTinMatrix	1
+		RT
+			1.0		0.0		0.0		0
+			0.0		1.0		0.0		0
+			0.0		0.0		1.0		0
+			0		0		0		1
+	endsegment
+
+
+    //True segment where are applied inertial values.
+	// Segment
+	segment toes_r
+		parent toes_r_reset_axis 
+		RTinMatrix	0
+		RT	-0.0	 0.0	 -0.0	xyz	-0.0	 -0.0	 -0.0
+		mass	0.21659999999999999
+		inertia
+			0.0001	0	0
+			0	0.00020000000000000001	0
+			0	0	0.0001
+		com	0.034599999999999999 0.0060000000000000001 -0.017500000000000002
+		meshfile	Geometry/bofoot.vtp
+		meshcolor	1 1 1
+		meshscale	1 1 1
+	endsegment
+
+	// Markers
+
+// Information about femur_l segment
+	// Segment
+	segment femur_l_parent_offset
+		parent pelvis 
+		RTinMatrix	0
+		RT	0 0 0	xyz	-0.070699999999999999 -0.066100000000000006 -0.083500000000000005
+	endsegment
+
+
+    // Segment to cancel transformation bases effect.
+	// Segment
+	segment femur_l_reset_axis
+		parent femur_l_parent_offset 
+		RTinMatrix	1
+		RT
+			1.0		0.0		0.0		0
+			0.0		1.0		0.0		0
+			0.0		0.0		1.0		0
+			0		0		0		1
+	endsegment
+
+
+    //True segment where are applied inertial values.
+	// Segment
+	segment femur_l
+		parent femur_l_reset_axis 
+		RTinMatrix	0
+		RT	-0.0	 0.0	 -0.0	xyz	-0.0	 -0.0	 -0.0
+		mass	9.3013999999999992
+		inertia
+			0.13389999999999999	0	0
+			0	0.035099999999999999	0
+			0	0	0.14119999999999999
+		com	0 -0.17000000000000001 0
+		meshfile	Geometry/femur_l.vtp
+		meshcolor	1 1 1
+		meshscale	1 1 1
+	endsegment
+
+	// Markers
+
+// Information about tibia_l segment
+	// Segment
+	segment tibia_l_parent_offset
+		parent femur_l 
+		RTinMatrix	0
+		RT	0 0 0	xyz	0 0 0
+	endsegment
+
+	// Segments to define transformation axis.
+	// Segment
+	segment tibia_l_translation
+		parent tibia_l_parent_offset 
+		RTinMatrix	1
+		RT
+			1.0		0.0		0.0		0
+			0.0		1.0		0.0		0
+			0.0		0.0		1.0		0
+			0		0		0		1
+		translations xy
+		// ranges
+				// -2.0943950999999998 0.17453293
+				// -2.0943950999999998 0.17453293
+	endsegment
+
+// Rotation transform was initially an orthogonal basis
+	// Segment
+	segment tibia_l_rotation_transform
+		parent tibia_l_translation 
+		RTinMatrix	1
+		RT
+			0.0		0.0		1.0		0
+			0.0		1.0		0.0		0
+			1.0		0.0		0.0		0
+			0		0		0		1
+		rotations x
+		// ranges
+				// -2.0943950999999998 0.17453293
+	endsegment
+
+
+    // Segment to cancel transformation bases effect.
+	// Segment
+	segment tibia_l_reset_axis
+		parent tibia_l_rotation_transform 
+		RTinMatrix	1
+		RT
+			0.0		0.0		1.0		0
+			0.0		1.0		0.0		0
+			1.0		0.0		0.0		0
+			0		0		0		1
+	endsegment
+
+	// Segment
+	segment tibia_l_geom_2
+		parent tibia_l_reset_axis 
+		RTinMatrix	0
+		RT	-0.0	 0.0	 -0.0	xyz	-0.0	 -0.0	 -0.0
+		meshfile	Geometry/l_fibula.vtp
+		meshcolor	1 1 1
+		meshscale	1 1 1
+	endsegment
+
+
+    //True segment where are applied inertial values.
+	// Segment
+	segment tibia_l
+		parent tibia_l_geom_2 
+		RTinMatrix	0
+		RT	0	 0	 0	xyz	0	 0	 0
+		mass	3.7075
+		inertia
+			0.0504	0	0
+			0	0.0051000000000000004	0
+			0	0	0.0511
+		com	0 -0.1867 0
+		meshfile	Geometry/tibia_l.vtp
+		meshcolor	1 1 1
+		meshscale	1 1 1
+	endsegment
+
+	// Markers
+
+// Information about talus_l segment
+	// Segment
+	segment talus_l_parent_offset
+		parent tibia_l 
+		RTinMatrix	0
+		RT	0 0 0	xyz	0 -0.42999999999999999 0
+	endsegment
+
+
+    // Segment to cancel transformation bases effect.
+	// Segment
+	segment talus_l_reset_axis
+		parent talus_l_parent_offset 
+		RTinMatrix	1
+		RT
+			1.0		0.0		0.0		0
+			0.0		1.0		0.0		0
+			0.0		0.0		1.0		0
+			0		0		0		1
+	endsegment
+
+
+    //True segment where are applied inertial values.
+	// Segment
+	segment talus_l
+		parent talus_l_reset_axis 
+		RTinMatrix	0
+		RT	-0.0	 0.0	 -0.0	xyz	-0.0	 -0.0	 -0.0
+		mass	0.10000000000000001
+		inertia
+			0.001	0	0
+			0	0.001	0
+			0	0	0.001
+		com	0 0 0
+		meshfile	Geometry/l_talus.vtp
+		meshcolor	1 1 1
+		meshscale	1 1 1
+	endsegment
+
+	// Markers
+
+// Information about calcn_l segment
+	// Segment
+	segment calcn_l_parent_offset
+		parent talus_l 
+		RTinMatrix	0
+		RT	0 0 0	xyz	-0.048770000000000001 -0.041950000000000001 -0.00792
+	endsegment
+
+
+    // Segment to cancel transformation bases effect.
+	// Segment
+	segment calcn_l_reset_axis
+		parent calcn_l_parent_offset 
+		RTinMatrix	1
+		RT
+			1.0		0.0		0.0		0
+			0.0		1.0		0.0		0
+			0.0		0.0		1.0		0
+			0		0		0		1
+	endsegment
+
+
+    //True segment where are applied inertial values.
+	// Segment
+	segment calcn_l
+		parent calcn_l_reset_axis 
+		RTinMatrix	0
+		RT	-0.0	 0.0	 -0.0	xyz	-0.0	 -0.0	 -0.0
+		mass	1.25
+		inertia
+			0.0014	0	0
+			0	0.0038999999999999998	0
+			0	0	0.0041000000000000003
+		com	0.10000000000000001 0.029999999999999999 0
+		meshfile	Geometry/l_foot.vtp
+		meshcolor	1 1 1
+		meshscale	1 1 1
+	endsegment
+
+	// Markers
+
+// Information about toes_l segment
+	// Segment
+	segment toes_l_parent_offset
+		parent calcn_l 
+		RTinMatrix	0
+		RT	0 0 0	xyz	0.17879999999999999 -0.002 -0.00108
+	endsegment
+
+
+    // Segment to cancel transformation bases effect.
+	// Segment
+	segment toes_l_reset_axis
+		parent toes_l_parent_offset 
+		RTinMatrix	1
+		RT
+			1.0		0.0		0.0		0
+			0.0		1.0		0.0		0
+			0.0		0.0		1.0		0
+			0		0		0		1
+	endsegment
+
+
+    //True segment where are applied inertial values.
+	// Segment
+	segment toes_l
+		parent toes_l_reset_axis 
+		RTinMatrix	0
+		RT	-0.0	 0.0	 -0.0	xyz	-0.0	 -0.0	 -0.0
+		mass	0.21659999999999999
+		inertia
+			0.0001	0	0
+			0	0.00020000000000000001	0
+			0	0	0.0001
+		com	0.034599999999999999 0.0060000000000000001 0.017500000000000002
+		meshfile	Geometry/l_bofoot.vtp
+		meshcolor	1 1 1
+		meshscale	1 1 1
+	endsegment
+
+	// Markers
+
+// Information about torso segment
+	// Segment
+	segment torso_parent_offset
+		parent pelvis 
+		RTinMatrix	0
+		RT	0 0 0	xyz	-0.1007 0.081500000000000003 0
+	endsegment
+
+
+    // Segment to cancel transformation bases effect.
+	// Segment
+	segment torso_reset_axis
+		parent torso_parent_offset 
+		RTinMatrix	1
+		RT
+			1.0		0.0		0.0		0
+			0.0		1.0		0.0		0
+			0.0		0.0		1.0		0
+			0		0		0		1
+	endsegment
+
+	// Segment
+	segment torso_geom_2
+		parent torso_reset_axis 
+		RTinMatrix	0
+		RT	-0.0	 0.0	 -0.0	xyz	-0.0	 -0.0	 -0.0
+		meshfile	Geometry/hat_jaw.vtp
+		meshcolor	1 1 1
+		meshscale	1 1 1
+	endsegment
+
+	// Segment
+	segment torso_geom_3
+		parent torso_geom_2 
+		RTinMatrix	0
+		RT	0	 0	 0	xyz	0	 0	 0
+		meshfile	Geometry/hat_skull.vtp
+		meshcolor	1 1 1
+		meshscale	1 1 1
+	endsegment
+
+	// Segment
+	segment torso_geom_4
+		parent torso_geom_3 
+		RTinMatrix	0
+		RT	0	 0	 0	xyz	0	 0	 0
+		meshfile	Geometry/hat_ribs.vtp
+		meshcolor	1 1 1
+		meshscale	1 1 1
+	endsegment
+
+
+    //True segment where are applied inertial values.
+	// Segment
+	segment torso
+		parent torso_geom_4 
+		RTinMatrix	0
+		RT	0	 0	 0	xyz	0	 0	 0
+		mass	34.236600000000003
+		inertia
+			1.4744999999999999	0	0
+			0	0.75549999999999995	0
+			0	0	1.4314
+		com	-0.029999999999999999 0.32000000000000001 0
+		meshfile	Geometry/hat_spine.vtp
+		meshcolor	1 1 1
+		meshscale	1 1 1
+	endsegment
+
+	// Markers
+
+// MUSCLE DEFINIION
+
+// pelvis > tibia_r
+musclegroup pelvis_to_tibia_r
+	OriginParent	pelvis
+	InsertionParent	tibia_r
+endmusclegroup
+
+	muscle	hamstrings_r
+		type	hilldegroote
+		statetype	degroote
+		musclegroup	pelvis_to_tibia_r
+		OriginPosition	-0.12595999999999999 -0.10256999999999999 0.069440000000000002
+		InsertionPosition	-0.023400000000000001 -0.056300000000000003 0.034299999999999997
+		optimalLength	0.109
+		maximalForce	2700
+		tendonSlackLength	0.32600000000000001
+		pennationAngle	0
+		maxVelocity	10
+	endmuscle
+
+		viapoint	bifemlh_r-P2
+			parent	tibia_r
+			muscle	hamstrings_r
+			musclegroup	pelvis_to_tibia_r
+			position	-0.030099999999999998 -0.035999999999999997 0.029430000000000001
+		endviapoint
+
+// femur_r > tibia_r
+musclegroup femur_r_to_tibia_r
+	OriginParent	femur_r
+	InsertionParent	tibia_r
+endmusclegroup
+
+	muscle	bifemsh_r
+		type	hilldegroote
+		statetype	degroote
+		musclegroup	femur_r_to_tibia_r
+		OriginPosition	0.0050000000000000001 -0.21110000000000001 0.023400000000000001
+		InsertionPosition	-0.023400000000000001 -0.056300000000000003 0.034299999999999997
+		optimalLength	0.17299999999999999
+		maximalForce	804
+		tendonSlackLength	0.088999999999999996
+		pennationAngle	0.40142572999999998
+		maxVelocity	10
+	endmuscle
+
+		viapoint	bifemsh_r-P2
+			parent	tibia_r
+			muscle	bifemsh_r
+			musclegroup	femur_r_to_tibia_r
+			position	-0.030099999999999998 -0.035999999999999997 0.029430000000000001
+		endviapoint
+
+// pelvis > femur_r
+musclegroup pelvis_to_femur_r
+	OriginParent	pelvis
+	InsertionParent	femur_r
+endmusclegroup
+
+	muscle	glut_max_r
+		type	hilldegroote
+		statetype	degroote
+		musclegroup	pelvis_to_femur_r
+		OriginPosition	-0.13489999999999999 0.017600000000000001 0.056300000000000003
+		InsertionPosition	-0.015599999999999999 -0.1016 0.0419
+		optimalLength	0.14699999999999999
+		maximalForce	1944
+		tendonSlackLength	0.127
+		pennationAngle	0
+		maxVelocity	10
+	endmuscle
+
+		viapoint	glut_max_r-P2
+			parent	pelvis
+			muscle	glut_max_r
+			musclegroup	pelvis_to_femur_r
+			position	-0.1376 -0.051999999999999998 0.091399999999999995
+		endviapoint
+
+		viapoint	glut_max_r-P3
+			parent	femur_r
+			muscle	glut_max_r
+			musclegroup	pelvis_to_femur_r
+			position	-0.042599999999999999 -0.052999999999999999 0.0293
+		endviapoint
+
+	muscle	iliopsoas_r
+		type	hilldegroote
+		statetype	degroote
+		musclegroup	pelvis_to_femur_r
+		OriginPosition	-0.064699999999999994 0.088700000000000001 0.028899999999999999
+		InsertionPosition	-0.018800000000000001 -0.059700000000000003 0.0104
+		optimalLength	0.10000000000000001
+		maximalForce	2342
+		tendonSlackLength	0.16
+		pennationAngle	0.13962633999999999
+		maxVelocity	10
+	endmuscle
+
+		viapoint	psoas_r-P2
+			parent	pelvis
+			muscle	iliopsoas_r
+			musclegroup	pelvis_to_femur_r
+			position	-0.023800000000000002 -0.057000000000000002 0.075899999999999995
+		endviapoint
+
+		viapoint	psoas_r-P4
+			parent	femur_r
+			muscle	iliopsoas_r
+			musclegroup	pelvis_to_femur_r
+			position	0.0016000000000000001 -0.050700000000000002 0.0038
+		endviapoint
+
+// pelvis > pelvis
+musclegroup pelvis_to_pelvis
+	OriginParent	pelvis
+	InsertionParent	pelvis
+endmusclegroup
+
+	muscle	rect_fem_r
+		type	hilldegroote
+		statetype	degroote
+		musclegroup	pelvis_to_pelvis
+		OriginPosition	-0.029499999999999998 -0.031099999999999999 0.096799999999999997
+		InsertionPosition	-0.029499999999999998 -0.031099999999999999 0.096799999999999997
+		optimalLength	0.114
+		maximalForce	1169
+		tendonSlackLength	0.31
+		pennationAngle	0.087266460000000004
+		maxVelocity	10
+	endmuscle
+
+	muscle	rect_fem_l
+		type	hilldegroote
+		statetype	degroote
+		musclegroup	pelvis_to_pelvis
+		OriginPosition	-0.029499999999999998 -0.031099999999999999 -0.096799999999999997
+		InsertionPosition	-0.029499999999999998 -0.031099999999999999 -0.096799999999999997
+		optimalLength	0.114
+		maximalForce	1169
+		tendonSlackLength	0.31
+		pennationAngle	0.087266460000000004
+		maxVelocity	10
+	endmuscle
+
+// femur_r > femur_r
+musclegroup femur_r_to_femur_r
+	OriginParent	femur_r
+	InsertionParent	femur_r
+endmusclegroup
+
+	muscle	vasti_r
+		type	hilldegroote
+		statetype	degroote
+		musclegroup	femur_r_to_femur_r
+		OriginPosition	0.029000000000000001 -0.19239999999999999 0.031
+		InsertionPosition	0.033500000000000002 -0.2084 0.028500000000000001
+		optimalLength	0.086999999999999994
+		maximalForce	5000
+		tendonSlackLength	0.13600000000000001
+		pennationAngle	0.052359879999999998
+		maxVelocity	10
+	endmuscle
+
+// femur_r > calcn_r
+musclegroup femur_r_to_calcn_r
+	OriginParent	femur_r
+	InsertionParent	calcn_r
+endmusclegroup
+
+	muscle	gastroc_r
+		type	hilldegroote
+		statetype	degroote
+		musclegroup	femur_r_to_calcn_r
+		OriginPosition	-0.019 -0.39290000000000003 -0.0235
+		InsertionPosition	0 0.031 -0.0053
+		optimalLength	0.059999999999999998
+		maximalForce	2500
+		tendonSlackLength	0.39000000000000001
+		pennationAngle	0.29670596999999999
+		maxVelocity	10
+	endmuscle
+
+// tibia_r > calcn_r
+musclegroup tibia_r_to_calcn_r
+	OriginParent	tibia_r
+	InsertionParent	calcn_r
+endmusclegroup
+
+	muscle	soleus_r
+		type	hilldegroote
+		statetype	degroote
+		musclegroup	tibia_r_to_calcn_r
+		OriginPosition	-0.0023999999999999998 -0.15329999999999999 0.0071000000000000004
+		InsertionPosition	0 0.031 -0.0053
+		optimalLength	0.050000000000000003
+		maximalForce	5137
+		tendonSlackLength	0.25
+		pennationAngle	0.43633231
+		maxVelocity	10
+	endmuscle
+
+	muscle	tib_ant_r
+		type	hilldegroote
+		statetype	degroote
+		musclegroup	tibia_r_to_calcn_r
+		OriginPosition	0.017899999999999999 -0.16239999999999999 0.0115
+		InsertionPosition	0.1166 0.0178 -0.030499999999999999
+		optimalLength	0.098000000000000004
+		maximalForce	3000
+		tendonSlackLength	0.223
+		pennationAngle	0.087266460000000004
+		maxVelocity	10
+	endmuscle
+
+		viapoint	tib_ant_r-P2
+			parent	tibia_r
+			muscle	tib_ant_r
+			musclegroup	tibia_r_to_calcn_r
+			position	0.032899999999999999 -0.39510000000000001 -0.0177
+		endviapoint
+
+// pelvis > tibia_l
+musclegroup pelvis_to_tibia_l
+	OriginParent	pelvis
+	InsertionParent	tibia_l
+endmusclegroup
+
+	muscle	hamstrings_l
+		type	hilldegroote
+		statetype	degroote
+		musclegroup	pelvis_to_tibia_l
+		OriginPosition	-0.12595999999999999 -0.10256999999999999 -0.069440000000000002
+		InsertionPosition	-0.023400000000000001 -0.056300000000000003 -0.034299999999999997
+		optimalLength	0.109
+		maximalForce	2700
+		tendonSlackLength	0.32600000000000001
+		pennationAngle	0
+		maxVelocity	10
+	endmuscle
+
+		viapoint	bifemlh_l-P2
+			parent	tibia_l
+			muscle	hamstrings_l
+			musclegroup	pelvis_to_tibia_l
+			position	-0.030099999999999998 -0.035999999999999997 -0.029430000000000001
+		endviapoint
+
+// femur_l > tibia_l
+musclegroup femur_l_to_tibia_l
+	OriginParent	femur_l
+	InsertionParent	tibia_l
+endmusclegroup
+
+	muscle	bifemsh_l
+		type	hilldegroote
+		statetype	degroote
+		musclegroup	femur_l_to_tibia_l
+		OriginPosition	0.0050000000000000001 -0.21110000000000001 -0.023400000000000001
+		InsertionPosition	-0.023400000000000001 -0.056300000000000003 -0.034299999999999997
+		optimalLength	0.17299999999999999
+		maximalForce	804
+		tendonSlackLength	0.088999999999999996
+		pennationAngle	0.40142572999999998
+		maxVelocity	10
+	endmuscle
+
+		viapoint	bifemsh_l-P2
+			parent	tibia_l
+			muscle	bifemsh_l
+			musclegroup	femur_l_to_tibia_l
+			position	-0.030099999999999998 -0.035999999999999997 -0.029430000000000001
+		endviapoint
+
+// pelvis > femur_l
+musclegroup pelvis_to_femur_l
+	OriginParent	pelvis
+	InsertionParent	femur_l
+endmusclegroup
+
+	muscle	glut_max_l
+		type	hilldegroote
+		statetype	degroote
+		musclegroup	pelvis_to_femur_l
+		OriginPosition	-0.13489999999999999 0.017600000000000001 -0.056300000000000003
+		InsertionPosition	-0.015599999999999999 -0.1016 -0.0419
+		optimalLength	0.14699999999999999
+		maximalForce	1944
+		tendonSlackLength	0.127
+		pennationAngle	0
+		maxVelocity	10
+	endmuscle
+
+		viapoint	glut_max_l-P2
+			parent	pelvis
+			muscle	glut_max_l
+			musclegroup	pelvis_to_femur_l
+			position	-0.1376 -0.051999999999999998 -0.091399999999999995
+		endviapoint
+
+		viapoint	glut_max_l-P3
+			parent	femur_l
+			muscle	glut_max_l
+			musclegroup	pelvis_to_femur_l
+			position	-0.042599999999999999 -0.052999999999999999 -0.0293
+		endviapoint
+
+	muscle	iliopsoas_l
+		type	hilldegroote
+		statetype	degroote
+		musclegroup	pelvis_to_femur_l
+		OriginPosition	-0.064699999999999994 0.088700000000000001 -0.028899999999999999
+		InsertionPosition	-0.018800000000000001 -0.059700000000000003 -0.0104
+		optimalLength	0.10000000000000001
+		maximalForce	2342
+		tendonSlackLength	0.16
+		pennationAngle	0.13962633999999999
+		maxVelocity	10
+	endmuscle
+
+		viapoint	psoas_l-P2
+			parent	pelvis
+			muscle	iliopsoas_l
+			musclegroup	pelvis_to_femur_l
+			position	-0.023800000000000002 -0.057000000000000002 -0.075899999999999995
+		endviapoint
+
+		viapoint	psoas_l-P4
+			parent	femur_l
+			muscle	iliopsoas_l
+			musclegroup	pelvis_to_femur_l
+			position	0.0016000000000000001 -0.050700000000000002 -0.0038
+		endviapoint
+
+// femur_l > femur_l
+musclegroup femur_l_to_femur_l
+	OriginParent	femur_l
+	InsertionParent	femur_l
+endmusclegroup
+
+	muscle	vasti_l
+		type	hilldegroote
+		statetype	degroote
+		musclegroup	femur_l_to_femur_l
+		OriginPosition	0.029000000000000001 -0.19239999999999999 -0.031
+		InsertionPosition	0.033500000000000002 -0.2084 -0.028500000000000001
+		optimalLength	0.086999999999999994
+		maximalForce	5000
+		tendonSlackLength	0.13600000000000001
+		pennationAngle	0.052359879999999998
+		maxVelocity	10
+	endmuscle
+
+// femur_l > calcn_l
+musclegroup femur_l_to_calcn_l
+	OriginParent	femur_l
+	InsertionParent	calcn_l
+endmusclegroup
+
+	muscle	gastroc_l
+		type	hilldegroote
+		statetype	degroote
+		musclegroup	femur_l_to_calcn_l
+		OriginPosition	-0.019 -0.39290000000000003 0.0235
+		InsertionPosition	0 0.031 0.0053
+		optimalLength	0.059999999999999998
+		maximalForce	2500
+		tendonSlackLength	0.39000000000000001
+		pennationAngle	0.29670596999999999
+		maxVelocity	10
+	endmuscle
+
+// tibia_l > calcn_l
+musclegroup tibia_l_to_calcn_l
+	OriginParent	tibia_l
+	InsertionParent	calcn_l
+endmusclegroup
+
+	muscle	soleus_l
+		type	hilldegroote
+		statetype	degroote
+		musclegroup	tibia_l_to_calcn_l
+		OriginPosition	-0.0023999999999999998 -0.15329999999999999 -0.0071000000000000004
+		InsertionPosition	0 0.031 0.0053
+		optimalLength	0.050000000000000003
+		maximalForce	5137
+		tendonSlackLength	0.25
+		pennationAngle	0.43633231
+		maxVelocity	10
+	endmuscle
+
+	muscle	tib_ant_l
+		type	hilldegroote
+		statetype	degroote
+		musclegroup	tibia_l_to_calcn_l
+		OriginPosition	0.017899999999999999 -0.16239999999999999 -0.0115
+		InsertionPosition	0.1166 0.0178 0.030499999999999999
+		optimalLength	0.098000000000000004
+		maximalForce	3000
+		tendonSlackLength	0.223
+		pennationAngle	0.087266460000000004
+		maxVelocity	10
+	endmuscle
+
+		viapoint	tib_ant_l-P2
+			parent	tibia_l
+			muscle	tib_ant_l
+			musclegroup	tibia_l_to_calcn_l
+			position	0.032899999999999999 -0.39510000000000001 0.0177
+		endviapoint
+
+/*-------------- WARNINGS---------------
+*/
